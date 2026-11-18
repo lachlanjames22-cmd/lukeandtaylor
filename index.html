@@ -702,7 +702,7 @@ const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* scene */
 const sky=$("#sky"),g=sky.getContext("2d");let W,H,stars=[],t0=performance.now();
-function size(){const D=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;sky.width=W*D;sky.height=H*D;g.setTransform(D,0,0,D,0,0);
+function size(){const D=innerWidth>900?1:Math.min(1.5,devicePixelRatio||1);W=innerWidth;H=innerHeight;sky.width=W*D;sky.height=H*D;g.setTransform(D,0,0,D,0,0);
   stars=Array.from({length:70},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.4,p:Math.random()*6}));}
 addEventListener("resize",size);size();
 function beach(t){
@@ -736,7 +736,8 @@ function club(t){
   stars.forEach((s,i)=>{const x=(Math.sin(i*12.9+t*.5)*.5+.5)*W,y=(Math.cos(i*7.3+t*.4)*.5+.5)*H;g.fillStyle=["rgba(255,255,255,.22)","rgba(63,242,255,.2)","rgba(255,63,180,.2)"][i%3];g.beginPath();g.arc(x,y,s.r+1,0,7);g.fill();});
   g.globalCompositeOperation="source-over";
 }
-function paint(now){const t=(now-t0)/1000;night()?club(t):beach(t);if(!still)requestAnimationFrame(paint);}
+let lastP=0;
+function paint(now){if(!still)requestAnimationFrame(paint);if(lastP&&(document.hidden||document.querySelector(".veil[id^=p-]:not([hidden])")||now-lastP<33))return;lastP=now;const t=(now-t0)/1000;night()?club(t):beach(t);}
 requestAnimationFrame(paint);
 
 /* music, generated in the page */
