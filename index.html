@@ -495,6 +495,9 @@ body.night .qwidget span{color:rgba(255,255,255,.7)}
 .mys.on{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
 .drm{border:none;background:none;color:var(--muted);font:inherit;font-size:.8rem;padding:6px;cursor:pointer;flex:none}
 .drm.sure{color:#d2452f;font-weight:700}
+
+.blurname{filter:blur(8px);user-select:none;-webkit-user-select:none;pointer-events:none;display:block;padding:4px 0}
+.dt .blurname{filter:blur(3.5px);padding:0}
 </style>
 
 <canvas id="sky" aria-hidden="true"></canvas>
@@ -670,7 +673,7 @@ body.night .qwidget span{color:rgba(255,255,255,.7)}
       <select id="iBy" aria-label="Added by"><option value="l">Added by Luke</option><option value="t">Added by Taylor</option></select>
       <select id="iPlan" aria-label="Who plans it"><option>Luke plans it</option><option>Taylor plans it</option><option>We plan it together</option></select>
     </div>
-    <label class="chk"><input type="checkbox" id="iMys"> Keep it a mystery</label>
+    <label class="chk"><input type="checkbox" id="iMys"> Blur it. Keep it a surprise.</label>
     <input id="iHint" placeholder="Hint they'll see (optional). e.g. Bring bathers." aria-label="Hint" hidden>
     <button class="btn" type="submit">Put it in the wheel</button>
   </form></details>
@@ -979,10 +982,9 @@ renderNights();
 /* wheel */
 const DATES=store.get("dates",[
   {n:"Sunrise swim + breakfast",d:"A weekday you're working from home. In the water as the sun comes up, then a proper breakfast. Bring bathers and a towel.",by:"l",plan:"Luke plans it"},
-  {n:"Op shop outfit challenge",d:"$50 each at an op shop. You buy the other person's outfit. Then dinner, and the waiters judge best dressed.",by:"l",plan:"We plan it together"},
-  {n:"Catamaran on the Swan",d:"Out on the water from South Perth. Luke sails, you sit back. Sunnies, and something warm for the breeze.",by:"l",plan:"Luke plans it"},
+  {n:"Op shop outfit challenge",d:"$50 each at an op shop. You buy the other person's outfit. Then dinner, and the waiters judge best dressed.",by:"l",plan:"We plan it together",m:true,h:"Bring $50 and an open mind."},
+  {n:"Catamaran on the Swan",d:"Out on the water from South Perth. Luke sails, you sit back. Then wine and cheese on the foreshore.",by:"l",plan:"Luke plans it",m:true,h:"Sunnies, and something warm for the breeze."},
   {n:"Wake park",d:"Luke picks you up, you both get dragged across the lake on a cable, Luke drops you home.",by:"l",plan:"Luke plans it"},
-  {n:"Hobie cats, then wine and cheese",d:"Thursday arvo sailing in South Perth, then wine and cheese on the foreshore.",by:"l",plan:"Luke plans it"},
   {n:"Bar Olé",d:"Spanish on the Applecross foreshore. Sangria, tapas, sunset over the river.",by:"l",plan:"Luke plans it"},
   {n:"Tomahawk Night",d:"The Bridge House, Fremantle. Wednesday or Thursday. A 1.2kg tomahawk for two with two glasses of wine.",by:"l",plan:"Luke plans it"},
   {n:"Hotel-room margarita night",d:"Our own shaker and kit. Everything we learnt at the masterclass, no bartender required.",by:"l",plan:"Luke plans it"},
@@ -991,6 +993,12 @@ if(!store.get("mig_dates1",false)){let ch=false;const f=DATES.findIndex(x=>x.n==
   if(f>-1&&lk===null){DATES.splice(f,1);ch=true;}
   const w=DATES.find(x=>x.n==="Your turn to plan one");if(w){w.n="Wildcard. Taylor plans.";w.d="Taylor plans the whole thing. Luke just turns up.";ch=true;}
   if(ch)store.set("dates",DATES);store.set("mig_dates1",true);}
+if(!store.get("mig_dates2",false)){let lk=store.get("locked",null);const lk0=lk;
+  const rm=n=>{const i=DATES.findIndex(x=>x.n===n);if(i<0||lk===i)return;DATES.splice(i,1);if(lk!==null&&lk>i)lk--;};
+  rm("Fun Cats");rm("Hobie cats, then wine and cheese");
+  const c=DATES.find(x=>x.n==="Catamaran on the Swan");if(c){c.m=true;c.h=c.h||"Sunnies, and something warm for the breeze.";c.d="Out on the water from South Perth. Luke sails, you sit back. Then wine and cheese on the foreshore.";}
+  const o=DATES.find(x=>x.n==="Op shop outfit challenge");if(o){o.m=true;o.h=o.h||"Bring $50 and an open mind.";}
+  store.set("dates",DATES);if(lk!==lk0)store.set("locked",lk);store.set("mig_dates2",true);}
 let ang=0,spinning=false,locked=store.get("locked",null),doneCount=store.get("done",0);
 function drawWheel(){const c=$("#wheel"),x=c.getContext("2d"),R=c.width/2,k=DATES.length,seg=2*Math.PI/k,n=night(),pal=n?["#1d1038","#2a1650"]:["#f3ece0","#dcecea"];
   x.clearRect(0,0,c.width,c.height);x.save();x.translate(R,R);x.rotate(ang);
@@ -1005,11 +1013,11 @@ $("#spin").onclick=()=>{if(spinning||locked!==null)return;spinning=true;const k=
   (function f(now){const p=Math.min(1,(now-t1)/dur),e=1-Math.pow(1-p,3);ang=start+delta*e;drawWheel();if(p<1)requestAnimationFrame(f);else{spinning=false;locked=pick;store.set("locked",pick);drawWheel();showDate(pick);confetti();}})(t1);};
 const hidden=d=>d.m&&d.by!==CLOUD.me;
 const pname=p=>p==="l"?"Luke":"Taylor";
-function showDate(i){const d=DATES[i],h=hidden(d);$("#dNo").textContent=`Date No. ${i+1}`;$("#dName").textContent=h?"Mystery date":d.n;
+function showDate(i){const d=DATES[i],h=hidden(d);$("#dNo").textContent=`Date No. ${i+1}`;$("#dName").innerHTML=h?`<span class="blurname" aria-label="Surprise date">Wouldn't you like to know</span>`:esc(d.n);
   $("#dDesc").textContent=h?(d.h||"No hints. Just turn up."):(d.d||(d.m?"":"No details. Just turn up."));
-  $("#dMeta").innerHTML=`<span class="tag"><i style="background:${d.by==="t"?"var(--taylor)":"var(--luke)"}"></i>Added by ${pname(d.by)}</span><span class="tag">${esc(d.plan)}</span>${d.m?`<span class="tag">${h?"Mystery":"Mystery to "+pname(d.by==="l"?"t":"l")}</span>`:""}`;
+  $("#dMeta").innerHTML=`<span class="tag"><i style="background:${d.by==="t"?"var(--taylor)":"var(--luke)"}"></i>Added by ${pname(d.by)}</span><span class="tag">${esc(d.plan)}</span>${d.m?`<span class="tag">${h?"Surprise":"Blurred for "+pname(d.by==="l"?"t":"l")}</span>`:""}`;
   const r=$("#dRespin"),have=bank(CLOUD.me);r.disabled=have<1;r.textContent=have<1?"Re-spin costs a token. Win a game first.":"Re-spin · 1 token";$("#p-date").hidden=false;}
-$("#dDone").onclick=()=>{const d=DATES[locked];if(d&&d.m){d.m=false;store.set("dates",DATES);toast(`Mystery solved: ${d.n}`);}
+$("#dDone").onclick=()=>{const d=DATES[locked];if(d&&d.m){d.m=false;store.set("dates",DATES);toast(`Surprise revealed: ${d.n}`);}
   const no=locked+1;locked=null;store.set("locked",null);doneCount++;store.set("done",doneCount);$("#p-date").hidden=true;drawWheel();dlist();
   if(d){pendingCap=`Date No. ${no}: ${d.n}`;$("#didName").textContent=d.n;$("#p-did").hidden=false;}};
 let pendingCap=null;$("#didSkip").onclick=()=>{pendingCap=null;$("#p-did").hidden=true;};
@@ -1017,9 +1025,9 @@ $("#dRespin").onclick=()=>{const me=CLOUD.me;if(bank(me)<1||locked===null)return
 $("#iMys").onchange=()=>{$("#iHint").hidden=!$("#iMys").checked;};
 $("#addForm").addEventListener("submit",e=>{e.preventDefault();const n=$("#iName").value.trim();if(!n)return;const m=$("#iMys").checked;
   DATES.push({n,d:$("#iDesc").value.trim(),by:$("#iBy").value,plan:$("#iPlan").value,m,h:m?$("#iHint").value.trim():""});store.set("dates",DATES);
-  $("#iName").value="";$("#iDesc").value="";$("#iHint").value="";$("#iMys").checked=false;$("#iHint").hidden=true;$("#addWrap").open=false;drawWheel();dlist();$("#wsub").textContent=m?"A mystery is in the wheel":`"${n}" is in the wheel`;});
+  $("#iName").value="";$("#iDesc").value="";$("#iHint").value="";$("#iMys").checked=false;$("#iHint").hidden=true;$("#addWrap").open=false;drawWheel();dlist();$("#wsub").textContent=m?"A surprise is in the wheel":`"${n}" is in the wheel`;});
 function dlist(){const me=CLOUD.me;$("#dlist").innerHTML=DATES.map((d,i)=>{const h=hidden(d),mine=d.by===me;
-  return `<div class="drow"><span class="dn">${i+1}</span><span class="dot ${d.by}">${d.by==="l"?"L":"T"}</span><div class="dt">${h?"Mystery date":esc(d.n)}${h&&d.h?`<small>${esc(d.h)}</small>`:""}</div>${mine?`<button type="button" class="mys ${d.m?"on":""}" data-i="${i}">${d.m?"Mystery":"Open"}</button><button type="button" class="drm" data-i="${i}" aria-label="Remove">✕</button>`:""}</div>`;}).join("");
+  return `<div class="drow"><span class="dn">${i+1}</span><span class="dot ${d.by}">${d.by==="l"?"L":"T"}</span><div class="dt">${h?`<span class="blurname" aria-label="Surprise date">Nice try, no peeking</span>`:esc(d.n)}${h&&d.h?`<small>${esc(d.h)}</small>`:""}</div>${mine?`<button type="button" class="mys ${d.m?"on":""}" data-i="${i}">${d.m?"Blurred":"Open"}</button><button type="button" class="drm" data-i="${i}" aria-label="Remove">✕</button>`:""}</div>`;}).join("");
   $("#dlist").querySelectorAll(".mys").forEach(b=>b.onclick=()=>{const d=DATES[b.dataset.i];d.m=!d.m;store.set("dates",DATES);dlist();});
   $("#dlist").querySelectorAll(".drm").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(!b.classList.contains("sure")){b.classList.add("sure");b.textContent="Sure?";setTimeout(()=>{if(b.isConnected)dlist();},2500);return;}
     if(DATES.length<=2){toast("Keep at least two on the wheel.");return;}if(locked===i){toast("That one's locked in. Do it or re-spin first.");return;}
