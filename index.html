@@ -814,6 +814,14 @@ body.night .qwidget span{color:rgba(255,255,255,.7)}
   <div class="pmeta"><span class="dot" id="lbDot"></span><b id="lbWho"></b><span id="lbDate"></span><button id="lbDel" type="button" hidden>Delete</button></div>
   <p id="lbCap"></p></div></div>
 
+<div class="veil" id="p-did" hidden><div class="sheet datecard" role="dialog" aria-label="Date done">
+  <div class="grab"></div>
+  <div class="no">Date done</div>
+  <h3 id="didName"></h3>
+  <p>Got a photo? Put it on Secretgram so it's on the record.</p>
+  <div class="two" style="width:100%"><button class="btn ghost" type="button" id="didSkip">Not this time</button><label class="btn" for="photo" style="text-align:center;cursor:pointer">Add a photo</label></div>
+</div></div>
+
 <div class="veil" id="p-compose" hidden><div class="sheet" role="dialog" aria-label="New post">
   <div class="grab"></div>
   <div class="head"><div><p class="eyebrow">Secretgram</p><h2>New post</h2></div><button class="x" type="button" id="cmpX" aria-label="Cancel">✕</button></div>
@@ -1002,7 +1010,9 @@ function showDate(i){const d=DATES[i],h=hidden(d);$("#dNo").textContent=`Date No
   $("#dMeta").innerHTML=`<span class="tag"><i style="background:${d.by==="t"?"var(--taylor)":"var(--luke)"}"></i>Added by ${pname(d.by)}</span><span class="tag">${esc(d.plan)}</span>${d.m?`<span class="tag">${h?"Mystery":"Mystery to "+pname(d.by==="l"?"t":"l")}</span>`:""}`;
   const r=$("#dRespin"),have=bank(CLOUD.me);r.disabled=have<1;r.textContent=have<1?"Re-spin costs a token. Win a game first.":"Re-spin · 1 token";$("#p-date").hidden=false;}
 $("#dDone").onclick=()=>{const d=DATES[locked];if(d&&d.m){d.m=false;store.set("dates",DATES);toast(`Mystery solved: ${d.n}`);}
-  locked=null;store.set("locked",null);doneCount++;store.set("done",doneCount);$("#p-date").hidden=true;drawWheel();dlist();};
+  const no=locked+1;locked=null;store.set("locked",null);doneCount++;store.set("done",doneCount);$("#p-date").hidden=true;drawWheel();dlist();
+  if(d){pendingCap=`Date No. ${no}: ${d.n}`;$("#didName").textContent=d.n;$("#p-did").hidden=false;}};
+let pendingCap=null;$("#didSkip").onclick=()=>{pendingCap=null;$("#p-did").hidden=true;};
 $("#dRespin").onclick=()=>{const me=CLOUD.me;if(bank(me)<1||locked===null)return;VAULT.spent[me]++;store.set("vault",VAULT);vault();locked=null;store.set("locked",null);$("#p-date").hidden=true;drawWheel();toast(`${pname(me)} spent a token. Spinning again.`);setTimeout(()=>$("#spin").click(),500);};
 $("#iMys").onchange=()=>{$("#iHint").hidden=!$("#iMys").checked;};
 $("#addForm").addEventListener("submit",e=>{e.preventDefault();const n=$("#iName").value.trim();if(!n)return;const m=$("#iMys").checked;
@@ -1200,7 +1210,7 @@ $("#lightbox").onclick=e=>{if(e.target.closest(".pmeta")||e.target.id==="lbCap")
 $("#lbDel").onclick=()=>{const d=$("#lbDel");if(!d.classList.contains("sure")){d.classList.add("sure");d.textContent="Tap again to delete";return;}
   const p=curPost;store.set(p.k,{del:true,t:p.t});CLOUD.remove(p.p).catch(()=>{});$("#lightbox").hidden=true;renderGrid(true);toast("Post deleted.");};
 let draft=null;
-$("#photo").addEventListener("change",e=>{const f=e.target.files[0];e.target.value="";if(!f)return;shrink(f,1400,u=>{draft=u;$("#cmpImg").src=u;$("#cmpCap").value="";$("#cmpGo").disabled=false;$("#cmpGo").textContent="Share";$("#p-compose").hidden=false;});});
+$("#photo").addEventListener("change",e=>{const f=e.target.files[0];e.target.value="";if(!f)return;shrink(f,1400,u=>{draft=u;$("#cmpImg").src=u;$("#cmpCap").value=pendingCap||"";pendingCap=null;$("#p-did").hidden=true;$("#cmpGo").disabled=false;$("#cmpGo").textContent="Share";$("#p-compose").hidden=false;});});
 $("#cmpX").onclick=()=>{$("#p-compose").hidden=true;draft=null;};
 $("#cmpGo").onclick=async()=>{if(!draft)return;const b=$("#cmpGo");b.disabled=true;b.textContent="Posting…";
   try{const path=await CLOUD.upload(draft),t=Date.now();URLS[path]=draft;store.set(`post_${t}_${CLOUD.me}`,{p:path,c:$("#cmpCap").value.trim(),by:CLOUD.me,t});
