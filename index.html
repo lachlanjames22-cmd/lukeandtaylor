@@ -715,7 +715,8 @@ body.night .qwidget span{color:rgba(255,255,255,.7)}
   <div class="grab"></div>
   <div class="head"><div><p class="eyebrow">Absolutely not</p><h2>Do not press</h2></div><button class="x" type="button" data-close aria-label="Close">✕</button></div>
   <div class="fmsg" id="fmsg" aria-live="polite">It's behind a safety cover for a reason.</div>
-  <div class="keys" id="keys"><div class="klamp" id="kL"><span class="dot l">L</span>Luke's key</div><div class="klamp" id="kT"><span class="dot t">T</span>Taylor's key</div></div>
+  <div class="pips" id="pips" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="keys" id="keys" hidden><div class="klamp" id="kL"><span class="dot l">L</span>Luke's key</div><div class="klamp" id="kT"><span class="dot t">T</span>Taylor's key</div></div>
   <div class="zone" id="zone">
     <div class="housing" id="housing"><button class="red" id="red" type="button">FUCK IT</button><button class="cover" id="cover" type="button" aria-label="Lift the safety cover"><span>DO NOT LIFT</span></button></div>
     <button class="key" id="key" type="button" hidden aria-label="Turn the arming key"><svg viewBox="0 0 32 32" fill="none" stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round"><circle cx="10" cy="16" r="5"/><path d="M15 16h13M24 16v4M28 16v3"/></svg><small>ARMING KEY</small></button>
@@ -1061,20 +1062,29 @@ function confetti(){if(still)return;const cols=[css("--luke"),css("--taylor"),cs
 const DARES=["Book flights to Sydney. Leave Friday.", "Book Bali. One way.", "Matching tattoos. Tonight.", "Elope in Vegas.", "Move to Spain. Taylor's done it before.", "Run away to New Zealand. Taylor knows the way.", "Fly to Tokyo for ramen. Back by Monday.", "Book Tomorrowland in Belgium.", "Skydive over Rottnest.", "Drive to Exmouth. Swim with whale sharks.", "Hire a yacht for the day.", "Buy a boat.", "Penthouse at Crown. The whole week.", "Open a beach bar in Bali.", "Get a puppy.", "Shave Luke's head. Dye Taylor's hair pink."];
 const REARM=7*864e5,FIRST_DARE="Book Bali. One way.";
 let DS=store.get("dare",{fired:[],last:null});const hold={l:store.get("dkey_l",0),t:store.get("dkey_t",0)};
-let holding=false,hb=null,cd=null,coverOpen=false;const hs=$("#housing"),zone=$("#zone"),cover=$("#cover"),red=$("#red");
+let holding=false,hb=null,cd=null,stage=0,armed=false;const hs=$("#housing"),zone=$("#zone"),cover=$("#cover"),red=$("#red"),key=$("#key");
+function pips(){document.querySelectorAll("#pips i").forEach((p,i)=>p.classList.toggle("on",i<stage));}
 function centre(){hs.style.left=(zone.clientWidth-150)/2+"px";hs.style.top=(zone.clientHeight-150)/2+"px";}
 function msg(t){$("#fmsg").textContent=t;}
 const keyLive=p=>!!hold[p]&&Math.abs(Date.now()-hold[p])<4500;
 const rearmLeft=()=>DS.last?DS.last.t+REARM-Date.now():0;
 function lamps(){$("#kL").classList.toggle("on",keyLive("l"));$("#kT").classList.toggle("on",keyLive("t"));}
 function renderButton(){lamps();const left=rearmLeft(),locked=DS.last&&left>0;
-  zone.hidden=locked;$("#keys").hidden=locked;$("#dare").hidden=!locked;
+  zone.hidden=locked;$("#keys").hidden=locked||stage<5;$("#pips").hidden=locked;$("#dare").hidden=!locked;
   if(locked){$("#dt").textContent=DS.last.text;const dys=Math.ceil(left/864e5);$("#rearm").textContent=`The button rearms in ${dys} day${dys===1?"":"s"}.`;msg("One at a time. Go and do it.");}
-  else if(!holding)msg(coverOpen?"Two keys. You both hold the button at the same time, on your own phones.":"It's behind a safety cover for a reason.");
+  else if(!holding&&stage===5)msg("Armed. Last step: you both hold the button at the same time, on your own phones.");
+  else if(stage===0)msg("It's behind a safety cover for a reason.");
   const f=DS.fired||[];$("#recWrap").hidden=!f.length;$("#drec").innerHTML=f.slice().reverse().map((x,i)=>`<div class="drow"><span class="dn">${f.length-i}</span><div class="dt">${esc(x)}</div></div>`).join("");}
-cover.onclick=()=>{if(coverOpen)return;coverOpen=true;cover.classList.add("open");renderButton();};
+/* five steps of nonsense on your own phone, then the sixth needs both of you */
+cover.onclick=()=>{if(stage!==0)return;cover.classList.add("open");stage=1;pips();msg("Safety cover's off. Bold.");};
+key.onclick=()=>{if(stage!==4||armed)return;armed=true;key.classList.add("turned");stage=5;pips();renderButton();};
+red.addEventListener("click",()=>{
+  if(stage===1){stage=2;pips();msg("You sure?");}
+  else if(stage===2){stage=3;pips();msg("Nah. Have another think.");let h=0;const iv=setInterval(()=>{hs.style.left=Math.random()*(zone.clientWidth-150)+"px";hs.style.top=Math.random()*(zone.clientHeight-150)+"px";if(++h>4){clearInterval(iv);centre();}},360);}
+  else if(stage===3){stage=4;pips();msg("Nope. Turn the arming key first.");key.hidden=false;}
+  else if(stage===4){msg("The key, champ. Bottom left.");}});
 function beat(){hold[CLOUD.me]=Date.now();store.set("dkey_"+CLOUD.me,hold[CLOUD.me]);checkKeys();}
-function press(){if(!coverOpen||rearmLeft()>0||holding)return;holding=true;beat();hb=setInterval(beat,1000);}
+function press(){if(stage!==5||rearmLeft()>0||holding)return;holding=true;beat();hb=setInterval(beat,1000);}
 function release(){if(!holding)return;holding=false;clearInterval(hb);hold[CLOUD.me]=0;store.set("dkey_"+CLOUD.me,0);stopCount();lamps();renderButton();}
 function stopCount(){clearInterval(cd);cd=null;$("#count").hidden=true;hs.classList.remove("pulse");}
 function checkKeys(){lamps();const ot=CLOUD.me==="l"?"t":"l",on=ot==="l"?"Luke":"Taylor";
@@ -1084,14 +1094,14 @@ function checkKeys(){lamps();const ot=CLOUD.me==="l"?"t":"l",on=ot==="l"?"Luke":
 function fire(){if(CLOUD.me!=="l"){msg("Launching…");return;} /* one phone picks, so you both get the same one */
   let f=DS.fired||[];let pool=DARES.filter(x=>!f.includes(x));if(!pool.length){f=[];pool=DARES.slice();}
   const text=!f.length&&!DS.last?FIRST_DARE:pool[Math.floor(Math.random()*pool.length)];
-  DS={fired:f.concat(text),last:{text,t:Date.now()}};store.set("dare",DS);release();boom();}
+  DS={fired:f.concat(text),last:{text,t:Date.now()}};store.set("dare",DS);release();stage=6;pips();boom();}
 function boom(){const sh=hs.closest(".sheet");sh.classList.add("shake");setTimeout(()=>sh.classList.remove("shake"),500);
   const f=document.createElement("div");f.className="flash";document.body.appendChild(f);setTimeout(()=>f.remove(),650);confetti();renderButton();}
-["pointerdown"].forEach(ev=>red.addEventListener(ev,e=>{e.preventDefault();press();}));
+red.addEventListener("pointerdown",()=>{if(stage===5)press();});
 ["pointerup","pointerleave","pointercancel"].forEach(ev=>red.addEventListener(ev,release));
 red.addEventListener("contextmenu",e=>e.preventDefault());document.addEventListener("visibilitychange",()=>{if(document.hidden)release();});
 setInterval(()=>{if(!$("#p-fuck").hidden){checkKeys();if(!holding)renderButton();}},1000);
-function resetButton(){release();coverOpen=false;cover.classList.remove("open");renderButton();centre();}
+function resetButton(){release();stage=0;armed=false;cover.classList.remove("open");key.hidden=true;key.classList.remove("turned");pips();renderButton();centre();}
 function remoteKey(p,v){hold[p]=v||0;checkKeys();}
 function remoteDare(v){const was=DS.last&&DS.last.t;DS=v||{fired:[],last:null};const fresh=DS.last&&DS.last.t!==was;release();if(fresh&&!$("#p-fuck").hidden)boom();else renderButton();}
 
