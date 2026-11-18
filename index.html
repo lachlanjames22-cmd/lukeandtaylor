@@ -387,6 +387,11 @@ body.night .face{background:#170f2b;border-color:var(--accent);box-shadow:inset 
 .morelist button:first-child{border-top:none}
 .morelist b{font-family:var(--display);font-weight:600;font-size:1.15rem;letter-spacing:-.02em}
 .morelist span{font-size:.82rem;color:var(--muted)}
+
+/* your faces on every L / T dot */
+.dot.l,.dot.t{background-size:cover;background-position:center;color:transparent;box-shadow:0 0 0 1.5px var(--luke)}
+.dot.l{background-image:url(img/luke.jpg)} .dot.t{background-image:url(img/taylor.jpg);box-shadow:0 0 0 1.5px var(--taylor)}
+.dot{width:26px;height:26px}
 </style>
 
 <canvas id="sky" aria-hidden="true"></canvas>
@@ -860,7 +865,7 @@ const TOP=40,STEP=46;
 const MARKS={0:"Stone cold sober",2:"Just the one, hey?",4:"Feeling a little tipsy",6:"Fuck it, let's have another",8:"Getting a little horny",10:"Luke & Taylor have arrived",12:"Best mates with the bartender",14:"Not walking straight",16:"Dancing on furniture",18:"Talking about Bali like it's booked",20:"Shots for strangers",23:"Lost a shoe",25:"Full Taylor",28:"Who has the hotel key?",30:"Someone call the Uber",33:"Kebab o'clock",35:"Tomorrow's written off",38:"Where are we?",40:"Saturday's session is cancelled"};
 const DRINKS=[{k:"marg",n:"Margarita",sd:2.0},{k:"champ",n:"Champagne",sd:1.4},{k:"wine",n:"Wine + ice",sd:1.5},{k:"pint",n:"Pint",sd:1.6},{k:"shot",n:"Shot",sd:1.0},{k:"espresso",n:"Espresso martini",sd:1.6}];
 const WASH=[{k:"loo",n:"Toilet break",drop:2,line:"broke the seal."},{k:"water",n:"Water",drop:1,line:"drank water. Weak."}];
-let who=CLOUD.me;const st={l:store.get("meter_l",{sd:0,pos:0}),t:store.get("meter_t",{sd:0,pos:0})};const pics={l:store.get("pic_l",null),t:store.get("pic_t",null)};
+let who=CLOUD.me;const st={l:store.get("meter_l",{sd:0,pos:0}),t:store.get("meter_t",{sd:0,pos:0})};const pics={l:store.get("pic_l",null)||"img/luke.jpg",t:store.get("pic_t",null)||"img/taylor.jpg"};
 document.querySelectorAll("#who button").forEach(b=>b.onclick=()=>{who=b.dataset.p;document.querySelectorAll("#who button").forEach(x=>x.classList.toggle("on",x===b));focusLadder();});
 const till=$("#till");
 DRINKS.forEach(d=>{const b=document.createElement("button");b.type="button";b.className="drink";b.innerHTML=`${I[d.k]}${d.n}<span class="sd">+${d.sd.toFixed(1)}</span>`;
@@ -1085,7 +1090,7 @@ document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>open(b.dataset.g
 const SEED=[{c:"Divine",g:"linear-gradient(160deg,#1f5c46,#0d2a21)"},{c:"Cantina OK",g:"linear-gradient(160deg,#c8573e,#5a1e14)"},{c:"Burns Beach",g:"linear-gradient(160deg,#7cb8c7,#e9d6ad)"},
   {c:"Tribe masterclass",g:"linear-gradient(160deg,#3b2a5c,#b0457d)"},{c:"Il Lido",g:"linear-gradient(160deg,#e9c27c,#2c6e7f)"},{c:"Sydney",g:"linear-gradient(160deg,#1d2b4a,#d9733d)"}];
 let POSTS=[];
-function renderPfp(){$("#pfp").innerHTML=["l","t"].map(p=>pics[p]?`<img alt="" src="${pics[p]}">`:`<span style="background:var(--${p==="l"?"luke":"taylor"})">${p.toUpperCase()}</span>`).join("");}
+function renderPfp(){$("#pfp").innerHTML=`<img alt="" src="img/club.jpg">`;}
 async function loadPosts(){try{POSTS=await CLOUD.photos();}catch(e){}renderGrid(true);}
 function renderGrid(noFetch){if(!noFetch){loadPosts();}const gEl=$("#grid");gEl.innerHTML=POSTS.map((u,i)=>`<button class="tile" type="button" data-i="${i}" aria-label="Open photo"><img alt="" src="${u}"></button>`).join("")+
   SEED.map(s=>`<div class="tile" style="background:${s.g}"><span class="ph">${s.c}</span></div>`).join("");
@@ -1105,7 +1110,7 @@ renderPfp();renderGrid(true);drawWheel();
   CLOUD.onRemote=(k,v)=>{
     switch(k){
       case"meter_l":case"meter_t":st[k.slice(-1)]=v||{sd:0,pos:0};place(true);break;
-      case"pic_l":case"pic_t":pics[k.slice(-1)]=v;buildLadder();renderPfp();break;
+      case"pic_l":case"pic_t":pics[k.slice(-1)]=v||(k==="pic_l"?"img/luke.jpg":"img/taylor.jpg");buildLadder();renderPfp();break;
       case"nights":NIGHTS=v||[];renderNights();break;
       case"dates":DATES.splice(0,DATES.length,...(v||[]));drawWheel();break;
       case"locked":locked=v;drawWheel();break;
