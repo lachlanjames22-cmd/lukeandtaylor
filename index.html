@@ -9,27 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="L&amp;T">
 <meta name="theme-color" content="#0b0716">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
-/* illustrated backgrounds: the two of you, beach by day, club by night */
-#sky,.stage{display:none!important}
-#bgimg{position:fixed;inset:0;z-index:0;background:#0b0716 url(https://d8j0ntlcm91z4.cloudfront.net/user_3DSqQGjoINhSQp9mbUXpRYXmN74/hf_20261118_081323_99013d3c-deaa-4635-a0d8-18e065b04c58.png) center 30%/cover no-repeat}
-body.night #bgimg{background-image:url(https://d8j0ntlcm91z4.cloudfront.net/user_3DSqQGjoINhSQp9mbUXpRYXmN74/hf_20261118_081521_71881886-17f2-468e-8fb9-6de1f2c5300d.png)}
-#bgimg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.38),rgba(0,0,0,0) 26%,rgba(0,0,0,0) 62%,rgba(0,0,0,.5))}
-@media (min-width:900px){#bgimg{background-size:contain;background-color:#efe6d6}body.night #bgimg{background-color:#0b0716}}
-.lasers{position:fixed;inset:0;z-index:1;pointer-events:none;display:none;overflow:hidden;mix-blend-mode:screen}
-body.night .lasers{display:block}
-.lasers i{position:absolute;top:-5%;left:50%;width:2px;height:130%;transform-origin:top center;opacity:.55;filter:blur(.6px);animation:sweep 7s ease-in-out infinite alternate}
-.lasers i:nth-child(odd){background:linear-gradient(#3ff2ff,rgba(63,242,255,0) 75%)}
-.lasers i:nth-child(even){background:linear-gradient(#ff3fb4,rgba(255,63,180,0) 75%)}
-.lasers i:nth-child(1){--a:-40deg;--b:-10deg}.lasers i:nth-child(2){--a:30deg;--b:5deg;animation-duration:9s}.lasers i:nth-child(3){--a:-15deg;--b:35deg;animation-duration:6s}
-.lasers i:nth-child(4){--a:45deg;--b:15deg;animation-duration:8s}.lasers i:nth-child(5){--a:-25deg;--b:-50deg;animation-duration:10s}.lasers i:nth-child(6){--a:10deg;--b:-30deg;animation-duration:7.5s}
-@keyframes sweep{from{transform:rotate(var(--a))}to{transform:rotate(var(--b))}}
-@media (prefers-reduced-motion:reduce){.lasers i{animation:none;transform:rotate(var(--a))}}
-#gate{background:#0b0716 url(https://d8j0ntlcm91z4.cloudfront.net/user_3DSqQGjoINhSQp9mbUXpRYXmN74/hf_20261118_081522_3aec976f-b48c-4296-9ea3-9262407c670c.png) center 25%/cover no-repeat}
-#gate::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55))}
-#gate .sheet{position:relative}
-@media (min-width:900px){#gate{background-size:contain}}
-</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
 <title>Luke &amp; Taylor</title>
@@ -410,7 +390,6 @@ body.night .face{background:#170f2b;border-color:var(--accent);box-shadow:inset 
 <canvas id="sky" aria-hidden="true"></canvas>
 <div class="grain" aria-hidden="true"></div>
 
-<div id="bgimg" aria-hidden="true"></div><div class="lasers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <div id="world" hidden>
   <div class="bar">
     <div class="brand"><span id="bname">The Beach House</span><small id="btag">Members only · est. 2026</small></div>
@@ -758,7 +737,7 @@ function club(t){
   g.globalCompositeOperation="source-over";
 }
 let lastP=0;
-function paint(now){return;if(!still)requestAnimationFrame(paint);if(lastP&&(document.hidden||document.querySelector(".veil[id^=p-]:not([hidden])")||now-lastP<33))return;lastP=now;const t=(now-t0)/1000;night()?club(t):beach(t);}
+function paint(now){if(!still)requestAnimationFrame(paint);if(lastP&&(document.hidden||document.querySelector(".veil[id^=p-]:not([hidden])")||now-lastP<33))return;lastP=now;const t=(now-t0)/1000;night()?club(t):beach(t);}
 requestAnimationFrame(paint);
 
 /* music, generated in the page */
