@@ -479,6 +479,22 @@ body.night .qwidget span{color:rgba(255,255,255,.7)}
 
 .gname{border:none;background:none;font:inherit;font-weight:600;font-size:.92rem;color:inherit;text-align:left;padding:0;cursor:pointer;min-width:0}
 .gname.sure{color:#d2452f;font-weight:700;font-size:.8rem}
+
+/* date wheel: mysteries, list, re-spin */
+.chk{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:600;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--ink)}
+.respin{margin-top:10px;width:100%;border:none;background:none;font:inherit;font-weight:600;font-size:.85rem;color:var(--muted);padding:10px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.respin:disabled{text-decoration:none;opacity:.7;cursor:default}
+#listWrap{margin-top:10px}
+.drow{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line);font-size:.9rem}
+.drow:first-child{border-top:none}
+.dn{font:700 .75rem "JetBrains Mono",monospace;color:var(--muted);width:18px;flex:none}
+.dt{flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere}
+.dt small{display:block;font-weight:400;color:var(--muted);font-size:.78rem}
+.mys{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:5px 10px;font:inherit;font-size:.72rem;font-weight:700;color:var(--muted);cursor:pointer;flex:none}
+.mys.on{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
+.drm{border:none;background:none;color:var(--muted);font:inherit;font-size:.8rem;padding:6px;cursor:pointer;flex:none}
+.drm.sure{color:#d2452f;font-weight:700}
 </style>
 
 <canvas id="sky" aria-hidden="true"></canvas>
@@ -649,13 +665,16 @@ body.night .qwidget span{color:rgba(255,255,255,.7)}
   <details class="add" id="addWrap"><summary><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add a date idea</summary>
   <form class="addform" id="addForm">
     <input id="iName" placeholder="What's the date?" aria-label="Date name" required>
-    <textarea id="iDesc" placeholder="Where, what it is, what to bring" aria-label="Description"></textarea>
+    <textarea id="iDesc" placeholder="Details (optional). Explain it, or don't." aria-label="Description"></textarea>
     <div class="two">
       <select id="iBy" aria-label="Added by"><option value="l">Added by Luke</option><option value="t">Added by Taylor</option></select>
       <select id="iPlan" aria-label="Who plans it"><option>Luke plans it</option><option>Taylor plans it</option><option>We plan it together</option></select>
     </div>
+    <label class="chk"><input type="checkbox" id="iMys"> Keep it a mystery</label>
+    <input id="iHint" placeholder="Hint they'll see (optional). e.g. Bring bathers." aria-label="Hint" hidden>
     <button class="btn" type="submit">Put it in the wheel</button>
   </form></details>
+  <details class="add" id="listWrap"><summary>What's on the wheel</summary><div id="dlist"></div></details>
 </div></div>
 
 <div class="veil" id="p-date" hidden><div class="sheet datecard" role="dialog" aria-label="Your date">
@@ -665,6 +684,7 @@ body.night .qwidget span{color:rgba(255,255,255,.7)}
   <p id="dDesc"></p>
   <div class="meta" id="dMeta"></div>
   <div class="two" style="width:100%"><button class="btn ghost" type="button" data-close>Later</button><button class="btn" type="button" id="dDone">We did it</button></div>
+  <button class="respin" type="button" id="dRespin">Re-spin · 1 token</button>
 </div></div>
 
 <div class="veil" id="p-fuck" hidden><div class="sheet" role="dialog" aria-label="Don't press">
@@ -958,8 +978,11 @@ const DATES=store.get("dates",[
   {n:"Bar Olé",d:"Spanish on the Applecross foreshore. Sangria, tapas, sunset over the river.",by:"l",plan:"Luke plans it"},
   {n:"Tomahawk Night",d:"The Bridge House, Fremantle. Wednesday or Thursday. A 1.2kg tomahawk for two with two glasses of wine.",by:"l",plan:"Luke plans it"},
   {n:"Hotel-room margarita night",d:"Our own shaker and kit. Everything we learnt at the masterclass, no bartender required.",by:"l",plan:"Luke plans it"},
-  {n:"Fun Cats",d:"Something silly. No dinner booking, just play.",by:"l",plan:"Luke plans it"},
-  {n:"Your turn to plan one",d:"Wildcard. Taylor plans the whole thing. Luke just turns up.",by:"t",plan:"Taylor plans it"}]);
+  {n:"Wildcard. Taylor plans.",d:"Taylor plans the whole thing. Luke just turns up.",by:"t",plan:"Taylor plans it"}]);
+if(!store.get("mig_dates1",false)){let ch=false;const f=DATES.findIndex(x=>x.n==="Fun Cats");const lk=store.get("locked",null);
+  if(f>-1&&lk===null){DATES.splice(f,1);ch=true;}
+  const w=DATES.find(x=>x.n==="Your turn to plan one");if(w){w.n="Wildcard. Taylor plans.";w.d="Taylor plans the whole thing. Luke just turns up.";ch=true;}
+  if(ch)store.set("dates",DATES);store.set("mig_dates1",true);}
 let ang=0,spinning=false,locked=store.get("locked",null),doneCount=store.get("done",0);
 function drawWheel(){const c=$("#wheel"),x=c.getContext("2d"),R=c.width/2,k=DATES.length,seg=2*Math.PI/k,n=night(),pal=n?["#1d1038","#2a1650"]:["#f3ece0","#dcecea"];
   x.clearRect(0,0,c.width,c.height);x.save();x.translate(R,R);x.rotate(ang);
@@ -972,11 +995,25 @@ function drawWheel(){const c=$("#wheel"),x=c.getContext("2d"),R=c.width/2,k=DATE
 $("#spin").onclick=()=>{if(spinning||locked!==null)return;spinning=true;const k=DATES.length,seg=2*Math.PI/k,pick=Math.floor(Math.random()*k),cur=((ang%(2*Math.PI))+2*Math.PI)%(2*Math.PI),
   target=(((-Math.PI/2-(pick*seg+seg/2))%(2*Math.PI))+2*Math.PI)%(2*Math.PI),delta=(target-cur+2*Math.PI)%(2*Math.PI)+2*Math.PI*(5+Math.floor(Math.random()*3)),start=ang,t1=performance.now(),dur=4000;
   (function f(now){const p=Math.min(1,(now-t1)/dur),e=1-Math.pow(1-p,3);ang=start+delta*e;drawWheel();if(p<1)requestAnimationFrame(f);else{spinning=false;locked=pick;store.set("locked",pick);drawWheel();showDate(pick);confetti();}})(t1);};
-function showDate(i){const d=DATES[i];$("#dNo").textContent=`Date No. ${i+1}`;$("#dName").textContent=d.n;$("#dDesc").textContent=d.d||"No description yet.";
-  $("#dMeta").innerHTML=`<span class="tag"><i style="background:${d.by==="t"?"var(--taylor)":"var(--luke)"}"></i>Added by ${d.by==="l"?"Luke":"Taylor"}</span><span class="tag">${d.plan}</span>`;$("#p-date").hidden=false;}
-$("#dDone").onclick=()=>{locked=null;store.set("locked",null);doneCount++;store.set("done",doneCount);$("#p-date").hidden=true;drawWheel();};
-$("#addForm").addEventListener("submit",e=>{e.preventDefault();const n=$("#iName").value.trim();if(!n)return;DATES.push({n,d:$("#iDesc").value.trim(),by:$("#iBy").value,plan:$("#iPlan").value});store.set("dates",DATES);
-  $("#iName").value="";$("#iDesc").value="";$("#addWrap").open=false;drawWheel();$("#wsub").textContent=`"${n}" is in the wheel`;});
+const hidden=d=>d.m&&d.by!==CLOUD.me;
+const pname=p=>p==="l"?"Luke":"Taylor";
+function showDate(i){const d=DATES[i],h=hidden(d);$("#dNo").textContent=`Date No. ${i+1}`;$("#dName").textContent=h?"Mystery date":d.n;
+  $("#dDesc").textContent=h?(d.h||"No hints. Just turn up."):(d.d||(d.m?"":"No details. Just turn up."));
+  $("#dMeta").innerHTML=`<span class="tag"><i style="background:${d.by==="t"?"var(--taylor)":"var(--luke)"}"></i>Added by ${pname(d.by)}</span><span class="tag">${esc(d.plan)}</span>${d.m?`<span class="tag">${h?"Mystery":"Mystery to "+pname(d.by==="l"?"t":"l")}</span>`:""}`;
+  const r=$("#dRespin"),have=bank(CLOUD.me);r.disabled=have<1;r.textContent=have<1?"Re-spin costs a token. Win a game first.":"Re-spin · 1 token";$("#p-date").hidden=false;}
+$("#dDone").onclick=()=>{const d=DATES[locked];if(d&&d.m){d.m=false;store.set("dates",DATES);toast(`Mystery solved: ${d.n}`);}
+  locked=null;store.set("locked",null);doneCount++;store.set("done",doneCount);$("#p-date").hidden=true;drawWheel();dlist();};
+$("#dRespin").onclick=()=>{const me=CLOUD.me;if(bank(me)<1||locked===null)return;VAULT.spent[me]++;store.set("vault",VAULT);vault();locked=null;store.set("locked",null);$("#p-date").hidden=true;drawWheel();toast(`${pname(me)} spent a token. Spinning again.`);setTimeout(()=>$("#spin").click(),500);};
+$("#iMys").onchange=()=>{$("#iHint").hidden=!$("#iMys").checked;};
+$("#addForm").addEventListener("submit",e=>{e.preventDefault();const n=$("#iName").value.trim();if(!n)return;const m=$("#iMys").checked;
+  DATES.push({n,d:$("#iDesc").value.trim(),by:$("#iBy").value,plan:$("#iPlan").value,m,h:m?$("#iHint").value.trim():""});store.set("dates",DATES);
+  $("#iName").value="";$("#iDesc").value="";$("#iHint").value="";$("#iMys").checked=false;$("#iHint").hidden=true;$("#addWrap").open=false;drawWheel();dlist();$("#wsub").textContent=m?"A mystery is in the wheel":`"${n}" is in the wheel`;});
+function dlist(){const me=CLOUD.me;$("#dlist").innerHTML=DATES.map((d,i)=>{const h=hidden(d),mine=d.by===me;
+  return `<div class="drow"><span class="dn">${i+1}</span><span class="dot ${d.by}">${d.by==="l"?"L":"T"}</span><div class="dt">${h?"Mystery date":esc(d.n)}${h&&d.h?`<small>${esc(d.h)}</small>`:""}</div>${mine?`<button type="button" class="mys ${d.m?"on":""}" data-i="${i}">${d.m?"Mystery":"Open"}</button><button type="button" class="drm" data-i="${i}" aria-label="Remove">✕</button>`:""}</div>`;}).join("");
+  $("#dlist").querySelectorAll(".mys").forEach(b=>b.onclick=()=>{const d=DATES[b.dataset.i];d.m=!d.m;store.set("dates",DATES);dlist();});
+  $("#dlist").querySelectorAll(".drm").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(!b.classList.contains("sure")){b.classList.add("sure");b.textContent="Sure?";setTimeout(()=>{if(b.isConnected)dlist();},2500);return;}
+    if(DATES.length<=2){toast("Keep at least two on the wheel.");return;}if(locked===i){toast("That one's locked in. Do it or re-spin first.");return;}
+    DATES.splice(i,1);if(locked!==null&&locked>i){locked--;store.set("locked",locked);}store.set("dates",DATES);drawWheel();dlist();});}
 function confetti(){if(still)return;const cols=[css("--luke"),css("--taylor"),css("--accent"),css("--gold")];for(let i=0;i<70;i++){const c=document.createElement("div");c.className="confetti";c.style.background=cols[i%4];c.style.left=innerWidth/2+"px";c.style.top=innerHeight/2+"px";document.body.appendChild(c);
   const a=Math.random()*Math.PI*2,v=150+Math.random()*260;c.animate([{transform:"none",opacity:1},{transform:`translate(${Math.cos(a)*v}px,${Math.sin(a)*v+220}px) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:1300+Math.random()*600,easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish=()=>c.remove();}}
 
@@ -1187,13 +1224,13 @@ renderPfp();renderGrid(true);drawWheel();
     if(!c){$("#qwQ").textContent="Roll for today's question";$("#qwS").textContent=Q.past.length?`${Q.past.length} answered so far. Tap to roll.`:"Tap to roll the dice";return;}
     const mine=(c[me]||"").trim(),theirs=(c[ot]||"").trim();$("#qwQ").textContent=c.q;
     $("#qwS").textContent=mine&&theirs?"You've both answered. Tap to reveal.":mine?`Waiting on ${on}.`:theirs?`${on}'s answered. Your turn.`:"Nobody's answered yet.";}
-  updateBadges();qWidget();setInterval(()=>{updateBadges();qWidget();},1500);
+  dlist();updateBadges();qWidget();setInterval(()=>{updateBadges();qWidget();},1500);
   CLOUD.onRemote=(k,v)=>{if(k.indexOf("post_")===0){if(!$("#p-album").hidden)renderGrid();else POSTS=postList();$("#sPosts").textContent=postList().length;return;}
     switch(k){
       case"meter_l":case"meter_t":st[k.slice(-1)]=v||{sd:0,pos:0};place(true);break;
       case"pic_l":case"pic_t":pics[k.slice(-1)]=v||(k==="pic_l"?"img/luke.jpg":"img/taylor.jpg");buildLadder();renderPfp();break;
       case"nights":NIGHTS=v||[];renderNights();break;
-      case"dates":DATES.splice(0,DATES.length,...(v||[]));drawWheel();break;
+      case"dates":DATES.splice(0,DATES.length,...(v||[]));drawWheel();dlist();break;
       case"locked":locked=v;drawWheel();break;
       case"done":doneCount=v||0;drawWheel();break;
       case"games":GAMES.splice(0,GAMES.length,...(v||[]));games();vault();break;
