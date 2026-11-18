@@ -858,82 +858,19 @@ let lastP=0;
 function paint(now){if(!still)requestAnimationFrame(paint);if(lastP&&(document.hidden||document.querySelector(".veil[id^=p-]:not([hidden])")||now-lastP<33))return;lastP=now;const t=(now-t0)/1000;night()?club(t):beach(t);}
 requestAnimationFrame(paint);
 
-/* music, generated in the page */
-let AC=null,master=null,muted=false,nextT=0,step=0,timer=null,NB=null,bed=null;const KS={};
-let iosUnlocked=false;
-function unlockIOS(){try{if(navigator.audioSession)navigator.audioSession.type="playback";}catch(e){}
-  if(iosUnlocked||!/iPhone|iPad|iPod/.test(navigator.userAgent)&&!(navigator.maxTouchPoints>1&&/Mac/.test(navigator.userAgent)))return;iosUnlocked=true;
-  try{const a=window.__iosA=new Audio("data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA");a.setAttribute("playsinline","");a.loop=true;a.volume=0.01;a.play().catch(()=>{});}catch(e){}}
-document.addEventListener("pointerdown",()=>{if(AC&&AC.state!=="running")AC.resume();},{passive:true});
+/* music: two real tracks, beach by day and DnB after dark */
+let AC=null,master=null,muted=false,musicOn=false;const VOL=.75;
+function tracks(){if(!window.__aud){window.__aud={};Object.keys(window.TRACKS).forEach(k=>{const a=new Audio(window.TRACKS[k]);a.loop=true;a.preload="auto";a.volume=0;window.__aud[k]=a;});}return window.__aud;}
+function fade(a,to,then){clearInterval(a._f);const from=a.volume,t0=performance.now();a._f=setInterval(()=>{const p=Math.min(1,(performance.now()-t0)/700);try{a.volume=from+(to-from)*p;}catch(e){}if(p>=1){clearInterval(a._f);then&&then();}},40);}
+function syncMusic(){if(!musicOn)return;const A=tracks(),on=night()?"night":"day",off=on==="night"?"day":"night";
+  if(muted||document.hidden){Object.values(A).forEach(a=>{clearInterval(a._f);a.pause();});return;}
+  A[on].play().catch(()=>{});fade(A[on],VOL);if(!A[off].paused)fade(A[off],0,()=>A[off].pause());}
+function startMusic(){try{if(navigator.audioSession)navigator.audioSession.type="playback";}catch(e){}window.__musicLive=true;musicOn=true;syncMusic();}
+/* if the browser blocked the first play, the next tap starts it */
+document.addEventListener("pointerdown",()=>{if(musicOn&&!muted){const a=tracks()[night()?"night":"day"];if(a.paused)syncMusic();}},{passive:true});
 /* stop the music when you leave the app, bring it back when you return */
-function hush(off){try{if(AC){off?AC.suspend():AC.resume();}const a=window.__iosA;if(a){off?a.pause():a.play().catch(()=>{});}}catch(e){}}
-document.addEventListener("visibilitychange",()=>hush(document.hidden));addEventListener("pagehide",()=>hush(true));addEventListener("pageshow",()=>{if(!document.hidden)hush(false);});
-function startMusic(){
-  unlockIOS();
-  try{AC=AC||window.__AC||new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
-  AC.resume();if(timer)return;
-  master=AC.createGain();master.gain.value=.6;const comp=AC.createDynamicsCompressor();master.connect(comp);comp.connect(AC.destination);
-  NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
-  const s=AC.createBufferSource();s.buffer=NB;s.loop=true;const f=AC.createBiquadFilter();f.type="lowpass";f.frequency.value=420;bed=AC.createGain();bed.gain.value=0;
-  s.connect(f);f.connect(bed);bed.connect(master);s.start();
-  nextT=AC.currentTime+.1;timer=setInterval(sched,25);setBed();
-}
-function setBed(){if(bed)bed.gain.setTargetAtTime(night()?0:.09,AC.currentTime,.5);}
-const bpm=()=>night()?174:92;
-function sched(){while(nextT<AC.currentTime+.15){night()?dnb(step%256,nextT):acoustic(step%64,nextT);nextT+=60/bpm()/4;step++;}}
-function env(gn,t,a,p,dec){gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(p,t+a);gn.gain.exponentialRampToValueAtTime(.0001,t+dec);}
-function noiseHit(t,type,f,v,dec,q){const s=AC.createBufferSource();s.buffer=NB;const fi=AC.createBiquadFilter();fi.type=type;fi.frequency.value=f;if(q)fi.Q.value=q;const gn=AC.createGain();env(gn,t,.001,v,dec);s.connect(fi);fi.connect(gn);gn.connect(master);s.start(t,Math.random());s.stop(t+dec+.05);}
-const hz=m=>440*Math.pow(2,(m-69)/12);
-function pluckBuf(f,len,damp){const k=f.toFixed(1)+"_"+len+"_"+damp;if(KS[k])return KS[k];const sr=AC.sampleRate,N=Math.round(sr/f),L=Math.floor(sr*len),b=AC.createBuffer(1,L,sr),d=b.getChannelData(0),r=new Float32Array(N);
-  let pv=0;for(let i=0;i<N;i++){pv=pv*.55+(Math.random()*2-1)*.45;r[i]=pv;}let j=0;for(let i=0;i<L;i++){const n=(j+1)%N,v=r[j];d[i]=v;r[j]=.5*(v+r[n])*damp;j=n;}return KS[k]=b;}
-function pluck(t,m,v,len,damp,cut){const s=AC.createBufferSource();s.buffer=pluckBuf(hz(m),len,damp);const fi=AC.createBiquadFilter();fi.type="lowpass";fi.frequency.value=cut;const gn=AC.createGain();gn.gain.value=v;s.connect(fi);fi.connect(gn);gn.connect(master);s.start(t);}
-/* -- beach: waves + soft island ukulele (re-entrant G C E A tuning), 92 bpm -- */
-const UKE=[[62,55,59,62],[64,59,62,67],[60,55,60,64],[62,57,60,66]]; /* C, Am, F, G7 voicings, string order G C E A */
-const STRUM={0:["d",.34],4:["d",.26],6:["u",.16],10:["u",.18],12:["d",.24],14:["u",.15]};
-function strum(t,ch,dir,v){const order=dir==="d"?ch:ch.slice().reverse();order.forEach((m,i)=>pluck(t+i*.016+Math.random()*.004,m,v*(dir==="d"?1:.75),1.8,.996,1700));}
-function wave(t,big){const s=AC.createBufferSource();s.buffer=NB;s.loop=true;const fi=AC.createBiquadFilter();fi.type="lowpass";fi.frequency.setValueAtTime(260,t);fi.frequency.linearRampToValueAtTime(big?2400:1500,t+1.8);fi.frequency.linearRampToValueAtTime(320,t+7);
-  const gn=AC.createGain();gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(big?.3:.18,t+1.8);gn.gain.exponentialRampToValueAtTime(.001,t+7.5);s.connect(fi);fi.connect(gn);gn.connect(master);s.start(t,Math.random());s.stop(t+8);
-  /* foam hiss as it breaks */const h=AC.createBufferSource();h.buffer=NB;h.loop=true;const hf=AC.createBiquadFilter();hf.type="highpass";hf.frequency.value=3000;const hg=AC.createGain();hg.gain.setValueAtTime(0,t+1.4);hg.gain.linearRampToValueAtTime(big?.07:.04,t+2);hg.gain.exponentialRampToValueAtTime(.001,t+5);h.connect(hf);hf.connect(hg);hg.connect(master);h.start(t+1.4,Math.random());h.stop(t+5.5);}
-function acoustic(s,t){const bar=Math.floor(s/16),b=s%16;
-  if(STRUM[b])strum(t,UKE[bar%4],STRUM[b][0],STRUM[b][1]*.55);
-  if(b===0&&bar%4===3)pluck(t+.02,UKE[bar%4][3]+12,.09,2,.997,2400);
-  if(b===0)wave(t,bar%2===0);}
-/* -- night: heavy drum and bass with dubby wobble, 174 bpm -- */
-function kick(t){const o=AC.createOscillator(),gn=AC.createGain();o.frequency.setValueAtTime(190,t);o.frequency.exponentialRampToValueAtTime(45,t+.06);env(gn,t,.001,1.1,.28);o.connect(gn);gn.connect(master);o.start(t);o.stop(t+.32);noiseHit(t,"highpass",2500,.2,.02);}
-function snare(t,v){noiseHit(t,"bandpass",2100,v,.2,.7);noiseHit(t,"highpass",5000,v*.4,.12);const o=AC.createOscillator(),gn=AC.createGain();o.frequency.setValueAtTime(240,t);o.frequency.exponentialRampToValueAtTime(170,t+.08);env(gn,t,.001,v*.7,.11);o.connect(gn);gn.connect(master);o.start(t);o.stop(t+.14);}
-let DIST=null;function dist(){if(DIST)return DIST;const n=2048,c=new Float32Array(n);for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=Math.tanh(x*4);}return DIST=c;}
-function sub(t,m,dur,v){const o=AC.createOscillator(),gn=AC.createGain();o.frequency.value=hz(m);gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(v,t+.01);gn.gain.setValueAtTime(v,t+dur-.03);gn.gain.linearRampToValueAtTime(0,t+dur);o.connect(gn);gn.connect(master);o.start(t);o.stop(t+dur);}
-function wob(t,m,dur,rate){const fi=AC.createBiquadFilter();fi.type="lowpass";fi.Q.value=11;fi.frequency.value=380;
-  const lfo=AC.createOscillator(),depth=AC.createGain();lfo.type="sine";lfo.frequency.value=rate;depth.gain.value=1500;lfo.connect(depth);depth.connect(fi.frequency);
-  const ws=AC.createWaveShaper();ws.curve=dist();const gn=AC.createGain();gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(.17,t+.01);gn.gain.setValueAtTime(.17,t+dur-.03);gn.gain.linearRampToValueAtTime(0,t+dur);
-  fi.connect(ws);ws.connect(gn);gn.connect(master);
-  [["sawtooth",-12],["sawtooth",12],["square",0]].forEach(([ty,dt])=>{const o=AC.createOscillator();o.type=ty;o.frequency.value=hz(m+12);o.detune.value=dt;o.connect(fi);o.start(t);o.stop(t+dur);});
-  lfo.start(t);lfo.stop(t+dur);sub(t,m,dur,.32);}
-function reese(t,m,dur){const fi=AC.createBiquadFilter();fi.type="lowpass";fi.Q.value=6;fi.frequency.setValueAtTime(180,t);fi.frequency.linearRampToValueAtTime(900,t+dur*.5);fi.frequency.linearRampToValueAtTime(220,t+dur);
-  const gn=AC.createGain();gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(.2,t+.02);gn.gain.setValueAtTime(.2,t+dur-.05);gn.gain.linearRampToValueAtTime(0,t+dur);fi.connect(gn);gn.connect(master);
-  [-9,9].forEach(c=>{const o=AC.createOscillator();o.type="sawtooth";o.frequency.value=hz(m+12);o.detune.value=c;o.connect(fi);o.start(t);o.stop(t+dur);});sub(t,m,dur,.33);}
-const ROOT=[28,28,31,29],B16=60/174/4,R8=174/60*2,R16=174/60*4,R12=174/60*3;
-function dnb(s,t){const bar=Math.floor(s/16),b=s%16,phrase=bar%16,drop=phrase>=4;
-  /* drums */
-  if(b===0||b===10||(drop&&b===7&&bar%2))kick(t);
-  if(b===4||b===12)snare(t,.8);
-  if(b===15||(b===9&&bar%2)||(b===2&&drop))snare(t,.14);
-  if(b%2===0)noiseHit(t,"highpass",9000,b%4===2?.1:.05,.03);
-  if(drop&&b%2===1)noiseHit(t,"highpass",10000,.03,.02);
-  if(b===14&&!drop)noiseHit(t,"highpass",7000,.06,.18);
-  /* bass */
-  const r=ROOT[bar%4];
-  if(!drop){if(b===0)reese(t,r,B16*16);}
-  else{
-    if(b===0)wob(t,r,B16*6,bar%2?R12:R8);
-    if(b===8)wob(t,r,B16*3,R16);
-    if(b===11)wob(t,r+3,B16*2,R16);
-    if(b===14)wob(t,r+(bar%4===3?7:5),B16*2,R8);}
-  /* build: riser before the drop */
-  if(phrase===3&&b===0){const n=AC.createBufferSource();n.buffer=NB;n.loop=true;const f=AC.createBiquadFilter();f.type="bandpass";f.Q.value=2;f.frequency.setValueAtTime(400,t);f.frequency.exponentialRampToValueAtTime(8000,t+B16*16);
-    const g2=AC.createGain();g2.gain.setValueAtTime(0,t);g2.gain.linearRampToValueAtTime(.12,t+B16*15);g2.gain.linearRampToValueAtTime(0,t+B16*16);n.connect(f);f.connect(g2);g2.connect(master);n.start(t);n.stop(t+B16*16);}
-  if(b===0&&bar%8===0){const o=AC.createOscillator(),gn=AC.createGain();o.type="triangle";o.frequency.value=hz(76);env(gn,t,.4,.04,3.5);o.connect(gn);gn.connect(master);o.start(t);o.stop(t+3.6);}}
-$("#sound").onclick=()=>{if(!AC){startMusic();return;}muted=!muted;master.gain.setTargetAtTime(muted?0:.6,AC.currentTime,.05);
+document.addEventListener("visibilitychange",syncMusic);addEventListener("pagehide",()=>{if(window.__aud)Object.values(window.__aud).forEach(a=>a.pause());});addEventListener("pageshow",syncMusic);
+$("#sound").onclick=()=>{if(!musicOn){startMusic();return;}muted=!muted;syncMusic();
   $("#wave1").style.display=$("#wave2").style.display=muted?"none":"";$("#sound").setAttribute("aria-label",muted?"Play music":"Mute music");};
 
 /* gate */
@@ -943,7 +880,7 @@ const ROASTS=["Nice try. Luke would've cracked it by now.","Wrong. Taylor would 
 $("#toggle").onclick=()=>{const n=document.body.classList.toggle("night");
   $("#btag").textContent=n?"After dark · DnB till late":"Members only · est. 2026";
   $("#toggle").textContent=n?"Back to the beach":"After dark";
-  if(still)requestAnimationFrame(paint);drawWheel();buildLadder();games();if(AC){setBed();step=Math.ceil(step/16)*16;}};
+  if(still)requestAnimationFrame(paint);drawWheel();buildLadder();games();syncMusic();};
 
 /* sheets */
 function open(id){closeAll();if(id==="album"){try{localStorage.setItem("lt_seen",Date.now());}catch(e){}}$("#p-"+id).hidden=false;if(id==="wheel")drawWheel();if(id==="ladder"){buildLadder();setTimeout(focusLadder,60);}if(id==="fuck")resetButton();if(id==="album")renderGrid();if(id==="vault"){games();vault();}if(id==="places")places();if(id==="questions"){showQ();armShake();}}
@@ -1299,7 +1236,9 @@ tick();setInterval(tick,15000);{const h=new Date().getHours();q("#gate").classLi
 /* gate */
 const ROASTS=["Nice try. Luke would've cracked it by now.","Wrong. Taylor would know this.","Members only, mate.","Nope. Have a margarita and think about it.","Not even close. The bartender knows this one.","Wrong again. Luke's embarrassed for you.","Taylor says no.","That's not it. Try the thing you always say."];let tries=0,ready=false,busy=false;
 function roast(){q("#roast").textContent=ROASTS[tries++%ROASTS.length];q("#pw").value="";}
-function unlockAudio(){try{if(!window.__AC){window.__AC=new (window.AudioContext||window.webkitAudioContext)();}window.__AC.resume();}catch(e){}}
+window.TRACKS={day:"audio/day.mp3",night:"audio/night.mp3"};
+function unlockAudio(){if(window.__aud)return;window.__aud={};Object.keys(window.TRACKS).forEach(k=>{const a=new Audio(window.TRACKS[k]);a.loop=true;a.preload="auto";a.volume=0;window.__aud[k]=a;
+  try{const pr=a.play();if(pr)pr.then(()=>{if(!window.__musicLive)a.pause();}).catch(()=>{});}catch(e){}});}
 async function startApp(session){C.me=(session.user.email||"").startsWith("taylor")?"t":"l";
   C.cache=await loadAll();
   const s=document.createElement("script");s.textContent=q("#appsrc").textContent;document.body.appendChild(s);
