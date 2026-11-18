@@ -982,8 +982,8 @@ renderNights();
 /* wheel */
 const DATES=store.get("dates",[
   {n:"Sunrise swim + breakfast",d:"A weekday you're working from home. In the water as the sun comes up, then a proper breakfast. Bring bathers and a towel.",by:"l",plan:"Luke plans it"},
-  {n:"Op shop outfit challenge",d:"$50 each at an op shop. You buy the other person's outfit. Then dinner, and the waiters judge best dressed.",by:"l",plan:"We plan it together",m:true,h:"Bring $50 and an open mind."},
-  {n:"Catamaran on the Swan",d:"Out on the water from South Perth. Luke sails, you sit back. Then wine and cheese on the foreshore.",by:"l",plan:"Luke plans it",m:true,h:"Sunnies, and something warm for the breeze."},
+  {n:"Op shop outfit challenge",d:"$50 each at an op shop. You buy the other person's outfit. Then dinner, and the waiters judge best dressed.",by:"l",plan:"We plan it together",m:true,h:"Can you impress for $50 only?"},
+  {n:"Catamaran on the Swan",d:"Out on the water from South Perth. Luke sails, you sit back. Then wine and cheese on the foreshore.",by:"l",plan:"Luke plans it",m:true,h:"Bring your bikini."},
   {n:"Wake park",d:"Luke picks you up, you both get dragged across the lake on a cable, Luke drops you home.",by:"l",plan:"Luke plans it"},
   {n:"Bar Olé",d:"Spanish on the Applecross foreshore. Sangria, tapas, sunset over the river.",by:"l",plan:"Luke plans it"},
   {n:"Tomahawk Night",d:"The Bridge House, Fremantle. Wednesday or Thursday. A 1.2kg tomahawk for two with two glasses of wine.",by:"l",plan:"Luke plans it"},
@@ -996,8 +996,8 @@ if(!store.get("mig_dates1",false)){let ch=false;const f=DATES.findIndex(x=>x.n==
 if(!store.get("mig_dates2",false)){let lk=store.get("locked",null);const lk0=lk;
   const rm=n=>{const i=DATES.findIndex(x=>x.n===n);if(i<0||lk===i)return;DATES.splice(i,1);if(lk!==null&&lk>i)lk--;};
   rm("Fun Cats");rm("Hobie cats, then wine and cheese");
-  const c=DATES.find(x=>x.n==="Catamaran on the Swan");if(c){c.m=true;c.h=c.h||"Sunnies, and something warm for the breeze.";c.d="Out on the water from South Perth. Luke sails, you sit back. Then wine and cheese on the foreshore.";}
-  const o=DATES.find(x=>x.n==="Op shop outfit challenge");if(o){o.m=true;o.h=o.h||"Bring $50 and an open mind.";}
+  const c=DATES.find(x=>x.n==="Catamaran on the Swan");if(c){c.m=true;c.h=c.h||"Bring your bikini.";c.d="Out on the water from South Perth. Luke sails, you sit back. Then wine and cheese on the foreshore.";}
+  const o=DATES.find(x=>x.n==="Op shop outfit challenge");if(o){o.m=true;o.h=o.h||"Can you impress for $50 only?";}
   store.set("dates",DATES);if(lk!==lk0)store.set("locked",lk);store.set("mig_dates2",true);}
 let ang=0,spinning=false,locked=store.get("locked",null),doneCount=store.get("done",0);
 function drawWheel(){const c=$("#wheel"),x=c.getContext("2d"),R=c.width/2,k=DATES.length,seg=2*Math.PI/k,n=night(),pal=n?["#1d1038","#2a1650"]:["#f3ece0","#dcecea"];
