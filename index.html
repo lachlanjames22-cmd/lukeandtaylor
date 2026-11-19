@@ -546,6 +546,28 @@ body.night .die3.land{box-shadow:0 0 0 1px rgba(255,63,180,.5),0 0 18px rgba(255
 .bz button.on{background:linear-gradient(135deg,#b3123a,#5a0c22);color:#fff;border-color:transparent;animation:bzz .12s linear infinite alternate}
 @keyframes bzz{from{transform:translateX(-1px)}to{transform:translateX(1px)}}
 @media (prefers-reduced-motion:reduce){.bz button.on{animation:none}}
+
+/* dnd board + dice */
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.bcol{display:grid;gap:5px;align-content:start}
+.bcol>small{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted);text-align:center;padding-bottom:2px}
+.bcard{position:relative;display:flex;align-items:center;gap:5px;min-height:42px;padding:5px 5px 5px 14px;border-radius:12px;background:var(--soft);border:1.5px solid transparent;transition:transform .08s,background .08s,opacity .2s}
+.bcard .bn{position:absolute;left:5px;top:4px;font:700 .5rem "JetBrains Mono",monospace;color:var(--muted);opacity:.7}
+.bcard .be{font-size:1.25rem;line-height:1;flex:none}
+.bcard .bt{font-size:.63rem;font-weight:600;line-height:1.15;min-width:0}
+.bcard.solo{justify-content:center;padding-left:7px}.bcard.solo .be{font-size:1.7rem}
+.bcard.hot{background:#ff3fb4;color:#12081f;transform:scale(1.04);border-color:#fff}
+.bcard.on{background:linear-gradient(135deg,#ff3fb4,#b3123a);color:#fff;border-color:#fff;transform:scale(1.06);box-shadow:0 0 18px rgba(255,63,180,.6);z-index:1}
+.bcard.on .bn{color:#fff}
+.board:has(.bcard.on) .bcol:has(.bcard.on) .bcard:not(.on){opacity:.38}
+.pdice{display:grid;grid-template-columns:repeat(3,1fr);justify-items:center;margin-bottom:12px}
+.pd{width:46px;height:46px;border-radius:11px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.35),inset 0 -3px 0 rgba(0,0,0,.12);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:7px;gap:2px}
+.pd i{border-radius:50%}.pd i.p{background:#12081f}
+.pd.tumble{animation:tumble .32s linear infinite}
+.pd.land{animation:thunk .28s ease-out;box-shadow:0 0 0 2px #ff3fb4,0 0 16px rgba(255,63,180,.6)}
+@keyframes tumble{0%{transform:rotate(0) translateY(0)}25%{transform:rotate(90deg) translateY(-7px)}50%{transform:rotate(180deg) translateY(0)}75%{transform:rotate(270deg) translateY(-5px)}100%{transform:rotate(360deg) translateY(0)}}
+@keyframes thunk{0%{transform:scale(1.35)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.pd.tumble,.pd.land{animation:none}}
 </style>
 
 <canvas id="sky" aria-hidden="true"></canvas>
@@ -872,11 +894,8 @@ body.night .die3.land{box-shadow:0 0 0 1px rgba(255,63,180,.5),0 0 18px rgba(255
   <div class="grab"></div>
   <div class="head"><div><p class="eyebrow">Hotel rooms only</p><h2>Do Not Disturb</h2></div><button class="x" type="button" data-close aria-label="Close">✕</button></div>
   <div class="dturn" id="dTurn"></div>
-  <div class="dice3">
-    <div class="die3" id="dieA"><small>Do this</small><b>?</b></div>
-    <div class="die3" id="dieB"><small>Here</small><b>?</b></div>
-    <div class="die3" id="dieC"><small>For</small><b>?</b></div>
-  </div>
+  <div class="board" id="dBoard"></div>
+  <div class="pdice"><div class="pd" id="pdA"></div><div class="pd" id="pdB"></div><div class="pd" id="pdC"></div></div>
   <div class="dclock" id="dClock" hidden><div class="dnum" id="dNum"></div><button class="btn" type="button" id="dGo">Start the clock</button></div>
   <button class="btn" type="button" id="dRoll">Roll</button>
   <button class="btn main" type="button" id="dMain" disabled>Main event · 3 more rounds to unlock</button>
@@ -1211,48 +1230,51 @@ $("#gameForm").addEventListener("submit",e=>{e.preventDefault();const n=$("#game
   GAMES.push({n,l:0,t:0});store.set("games",GAMES);$("#gameName").value="";$("#gameWrap").open=false;games();toast(`${n} added to the scoreboard.`);});
 document.querySelectorAll("#vtabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#vtabs button").forEach(x=>x.classList.toggle("on",x===b));$("#vScores").hidden=b.dataset.v!=="scores";$("#vPrizes").hidden=b.dataset.v!=="prizes";});
 
-/* do not disturb: action, body part, timer */
+/* do not disturb: a board of faces, three dice, and a few soft rules so every roll is a good one */
 const DND={
-  a:["Kiss","Lick","Suck","Bite, gently","Stroke","Tease with your fingertips"],
-  b:["Neck","Nipples","Inner thighs","🍑","Between the legs","Their choice"],
-  c:[["30 seconds",30],["1 minute",60],["2 minutes",120],["5 minutes",300],["Until they beg",0],["Until they finish",0]],
-  wild:["Swap. They do it to you.","Blindfold on them first."],
-  m:[["Her on top","From behind","Missionary","Standing","On the edge of the bed","Their choice"],
-     ["Slow the whole way","Hard and fast","Eyes locked","Teasing. Stop and start.","Quiet. Not a sound.","Whoever rolled decides"],
-     ["The bed","The shower","Up against the window","The desk","The floor","The chair"]],
-  need:3};
-/* main event unlocks after a few rounds, and stays unlocked for the night */
+  fore:{heads:["Do this","Here","For"],cols:[
+    [["💋","Kiss"],["👅","Lick"],["🫦","Suck"],["😈","Bite, gently"],["✋","Stroke"],["🪶","Tease, fingertips"]],
+    [["👄","Lips"],["🍒","Nipples"],["🦵","Inner thighs"],["🍑",""],["🔥","Between the legs"],["🎯","Their choice"]],
+    [["⚡","30 seconds",30],["⏱️","1 minute",60],["⏳","2 minutes",120],["🕔","5 minutes",300],["🙏","Until they beg",0],["💦","Until they finish",0]]]},
+  main:{heads:["Position","How","Where"],cols:[
+    [["🤠","Her on top"],["🍑","From behind"],["🫂","Missionary"],["🧍","Standing"],["🛏️","Edge of the bed"],["🎯","Their choice"]],
+    [["🐢","Slow the whole way"],["🔥","Hard and fast"],["👀","Eyes locked"],["🚦","Stop and start"],["🤫","Not a sound"],["🎲","Roller decides"]],
+    [["🛏️","The bed"],["🚿","The shower"],["🪟","The window"],["💻","The desk"],["🧎","The floor"],["🪑","The chair"]]]},
+  wild:["Swap. They do it to you.","Blindfold on them first."],need:3};
+/* soft rules (foreplay): finishing only where it can happen, light touches get short clocks, no biting down there */
+function dndOk(a,b,c){if(c===5&&b!==4&&b!==5)return false;if(a===5&&c>2&&b!==4)return false;if(a===3&&b===4)return false;return true;}
 const dKey=()=>new Date(Date.now()-12*36e5).toDateString();
 function dRounds(){try{const v=JSON.parse(localStorage.getItem("lt_dnd")||"{}");return v.d===dKey()?v.n||0:0;}catch(e){return 0;}}
 function dBump(){try{localStorage.setItem("lt_dnd",JSON.stringify({d:dKey(),n:dRounds()+1}));}catch(e){}}
 function dMainBtn(){const left=DND.need-dRounds(),b=$("#dMain");b.disabled=left>0;b.textContent=left>0?`Main event · ${left} more round${left===1?"":"s"} to unlock`:"Roll the main event";}
-const dLabels=m=>{const L=m?["Position","How","Where"]:["Do this","Here","For"];["A","B","C"].forEach((k,i)=>$("#die"+k).querySelector("small").textContent=L[i]);};
-let dndTurn=null,dndSecs=0,dndIv=null,dndBusy=false;
+let dndTurn=null,dndSecs=0,dndIv=null,dndBusy=false,dndMode=false,dndRe=false;
 const dOther=p=>p==="l"?"t":"l",fmt=n=>`${Math.floor(n/60)}:${String(n%60).padStart(2,"0")}`;
-function dndRender(){dMainBtn();if(!dndTurn)dndTurn=CLOUD.me;$("#dTurn").textContent=`${pname(dndTurn)} rolls. ${pname(dndTurn)} does it to ${pname(dOther(dndTurn))}.`;}
+const DPIPS=[[4],[0,8],[0,4,8],[0,2,6,8],[0,2,4,6,8],[0,2,3,5,6,8]];
+function pd(el,n){el.innerHTML=Array.from({length:9},(_,i)=>`<i class="${DPIPS[n].includes(i)?"p":""}"></i>`).join("");}
+function dBoard(){const M=dndMode?DND.main:DND.fore;$("#dBoard").innerHTML=M.cols.map((col,ci)=>`<div class="bcol"><small>${M.heads[ci]}</small>${col.map((f,i)=>`<div class="bcard${f[1]?"":" solo"}" data-c="${ci}" data-i="${i}"><span class="bn">${i+1}</span><span class="be">${f[0]}</span>${f[1]?`<span class="bt">${f[1]}</span>`:""}</div>`).join("")}</div>`).join("");
+  ["A","B","C"].forEach(k=>{const e=$("#pd"+k);e.classList.remove("land");pd(e,0);});}
+function dndRender(){dMainBtn();if(!dndTurn)dndTurn=CLOUD.me;if(!$("#dBoard").children.length)dBoard();$("#dTurn").textContent=`${pname(dndTurn)} rolls. ${pname(dndTurn)} does it to ${pname(dOther(dndTurn))}.`;}
 function dndStop(){clearInterval(dndIv);dndIv=null;$("#dClock").hidden=true;$("#dStop").hidden=true;$("#dNum").classList.remove("done");}
-let dndMode=false,dndRe=false;
-function dndRoll(main){if(dndBusy)return;dndMode=!!main;dndStop();dndBusy=true;$("#dAgain").hidden=true;$("#dRoll").disabled=true;$("#dMain").disabled=true;dLabels(dndMode);
-  const pick=x=>x[Math.floor(Math.random()*x.length)];
-  if(dndMode){const res=DND.m.map(pick);$("#dTurn").textContent=`Main event. ${pname(dndTurn||CLOUD.me)} rolled it.`;
-    ["A","B","C"].forEach((k,i)=>{const el=$("#die"+k),b=el.querySelector("b");el.classList.remove("land","wild");el.classList.add("roll");b.classList.remove("emo");const iv=setInterval(()=>{b.textContent=pick(DND.m[i]);},70);
-      setTimeout(()=>{clearInterval(iv);b.textContent=res[i];el.classList.remove("roll");el.classList.add("land");try{navigator.vibrate&&navigator.vibrate(18);}catch(e){}
-        if(i===2){dndBusy=false;dndRe=false;$("#dRoll").disabled=false;$("#dRoll").textContent="Back to the dice";$("#dStop").hidden=false;dMainBtn();
-          const have=bank(CLOUD.me);$("#dAgain").hidden=false;$("#dAgain").disabled=have<1;$("#dAgain").textContent=have<1?"Re-roll needs a token":"Re-roll · 1 token";}},900+i*450);});return;}
-  const res=[pick(DND.a),pick(DND.b),pick(DND.c)],wild=Math.random()<.12?pick(DND.wild):null;
-  ["A","B","C"].forEach((k,i)=>{const el=$("#die"+k),b=el.querySelector("b");el.classList.remove("land","wild");el.classList.add("roll");
-    const src=[DND.a,DND.b,DND.c.map(x=>x[0])][i];b.classList.remove("emo");const iv=setInterval(()=>{b.textContent=pick(src);},70);
-    setTimeout(()=>{clearInterval(iv);b.textContent=i===2?res[2][0]:res[i];b.classList.toggle("emo",b.textContent==="🍑");el.classList.remove("roll");el.classList.add("land");try{navigator.vibrate&&navigator.vibrate(18);}catch(e){}
-      if(i===2){dndBusy=false;if(!dndRe)dBump();dndRe=false;dMainBtn();$("#dRoll").disabled=false;$("#dRoll").textContent="Next turn";$("#dStop").hidden=false;
-        const have=bank(CLOUD.me);$("#dAgain").hidden=false;$("#dAgain").disabled=have<1;$("#dAgain").textContent=have<1?"Re-roll needs a token":"Re-roll · 1 token";
-        if(wild){$("#dieA").classList.add("wild");$("#dTurn").textContent=`Wild card. ${wild}`;}
-        dndSecs=res[2][1];$("#dClock").hidden=false;$("#dGo").hidden=!dndSecs;$("#dNum").textContent=dndSecs?fmt(dndSecs):"No clock";}
-    },900+i*450);});}
-$("#dRoll").onclick=()=>{if($("#dRoll").textContent!=="Roll"){dndTurn=dOther(dndTurn);}dndRender();dndRoll(false);};
+function dndRoll(main){if(dndBusy)return;dndMode=!!main;dndStop();dndBusy=true;$("#dAgain").hidden=true;$("#dRoll").disabled=true;$("#dMain").disabled=true;dBoard();
+  const r6=()=>Math.floor(Math.random()*6);let res;do{res=[r6(),r6(),r6()];}while(!dndMode&&!dndOk(res[0],res[1],res[2]));
+  const M=dndMode?DND.main:DND.fore,wild=!dndMode&&Math.random()<.12?DND.wild[Math.floor(Math.random()*DND.wild.length)]:null;
+  if(dndMode)$("#dTurn").textContent=`Main event. ${pname(dndTurn||CLOUD.me)} rolled it.`;
+  const dice=["A","B","C"].map(k=>$("#pd"+k));dice.forEach(d=>d.classList.add("tumble"));const tum=setInterval(()=>dice.forEach(d=>{if(d.classList.contains("tumble"))pd(d,r6());}),90);
+  const col=ci=>new Promise(done=>{const cards=[...document.querySelectorAll(`.bcard[data-c="${ci}"]`)];const hops=12+res[ci]+(ci*3);let h=0,pos=0;
+    const step=()=>{cards.forEach(c=>c.classList.remove("hot"));pos=h%6;cards[pos].classList.add("hot");try{navigator.vibrate&&h%2===0&&navigator.vibrate(6);}catch(e){}
+      if(h>=hops&&pos===res[ci]){cards[pos].classList.remove("hot");cards[pos].classList.add("on");dice[ci].classList.remove("tumble");dice[ci].classList.add("land");pd(dice[ci],res[ci]);try{navigator.vibrate&&navigator.vibrate(25);}catch(e){}done();return;}
+      h++;setTimeout(step,55+Math.max(0,h-hops+8)*22);};step();});
+  col(0).then(()=>col(1)).then(()=>col(2)).then(()=>{clearInterval(tum);dndBusy=false;$("#dRoll").disabled=false;$("#dStop").hidden=false;
+    const have=bank(CLOUD.me);$("#dAgain").hidden=false;$("#dAgain").disabled=have<1;$("#dAgain").textContent=have<1?"Re-roll needs a token":"Re-roll · 1 token";
+    if(dndMode){dndRe=false;$("#dRoll").textContent="Back to the dice";dMainBtn();return;}
+    if(!dndRe)dBump();dndRe=false;dMainBtn();$("#dRoll").textContent="Next turn";
+    if(wild)$("#dTurn").textContent=`Wild card. ${wild}`;
+    const t=M.cols[2][res[2]];dndSecs=t[2];$("#dClock").hidden=false;$("#dGo").hidden=!dndSecs;$("#dNum").textContent=dndSecs?fmt(dndSecs):"No clock";});}
+$("#dRoll").onclick=()=>{if($("#dRoll").textContent!=="Roll"){dndTurn=dOther(dndTurn);}dndMode=false;dndRender();dndRoll(false);};
 $("#dMain").onclick=()=>{if(dRounds()<DND.need)return;dndRoll(true);};
 $("#dAgain").onclick=()=>{const me=CLOUD.me;if(bank(me)<1)return;VAULT.spent[me]++;store.set("vault",VAULT);vault();toast(`${pname(me)} spent a token.`);dndRe=true;if(!dndMode)dndRender();dndRoll(dndMode);};
 $("#dGo").onclick=()=>{if(dndIv||!dndSecs)return;$("#dGo").hidden=true;let n=dndSecs;dndIv=setInterval(()=>{n--;$("#dNum").textContent=fmt(Math.max(n,0));if(n<=0){clearInterval(dndIv);dndIv=null;$("#dNum").textContent="Time.";$("#dNum").classList.add("done");try{navigator.vibrate&&navigator.vibrate([120,80,120]);}catch(e){}}},1000);};
-$("#dStop").onclick=()=>{dndStop();dndMode=false;dLabels(false);dMainBtn();$("#dAgain").hidden=true;$("#dRoll").textContent="Roll";["A","B","C"].forEach(k=>{const el=$("#die"+k);el.classList.remove("land","wild");el.querySelector("b").classList.remove("emo");el.querySelector("b").textContent="?";});$("#dTurn").textContent="Red light. Stopped. Roll again when you both want to.";};
+$("#dStop").onclick=()=>{dndStop();dndMode=false;dBoard();dMainBtn();$("#dAgain").hidden=true;$("#dRoll").textContent="Roll";$("#dTurn").textContent="Red light. Stopped. Roll again when you both want to.";};
 
 /* buzz: only on phones that can vibrate from a web page (Android, not iPhone) */
 const BUZZ={steady:[10000],pulse:[350,180],wave:[150,90,150,90,600,280],build:[100,450,200,400,350,320,550,260,800,200,1200,150,1800,100,2600,120]};
