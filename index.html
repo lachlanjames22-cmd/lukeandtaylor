@@ -537,6 +537,8 @@ body.night .die3.land{box-shadow:0 0 0 1px rgba(255,63,180,.5),0 0 18px rgba(255
 
 .btn.main{margin-top:10px;background:linear-gradient(135deg,#b3123a,#5a0c22);color:#fff}
 .btn.main:disabled{background:var(--soft);color:var(--muted);opacity:1}
+
+.die3 b.emo{font-size:2.6rem;line-height:1}
 </style>
 
 <canvas id="sky" aria-hidden="true"></canvas>
@@ -1202,7 +1204,7 @@ document.querySelectorAll("#vtabs button").forEach(b=>b.onclick=()=>{document.qu
 /* do not disturb: action, body part, timer */
 const DND={
   a:["Kiss","Lick","Suck","Bite, gently","Stroke","Tease with your fingertips"],
-  b:["Neck","Nipples","Inner thighs","Arse","Between the legs","Their choice"],
+  b:["Neck","Nipples","Inner thighs","🍑","Between the legs","Their choice"],
   c:[["30 seconds",30],["1 minute",60],["2 minutes",120],["5 minutes",300],["Until they beg",0],["Until they finish",0]],
   wild:["Swap. They do it to you.","Blindfold on them first."],
   m:[["Her on top","From behind","Missionary","Standing","On the edge of the bed","Their choice"],
@@ -1223,14 +1225,14 @@ let dndMode=false,dndRe=false;
 function dndRoll(main){if(dndBusy)return;dndMode=!!main;dndStop();dndBusy=true;$("#dAgain").hidden=true;$("#dRoll").disabled=true;$("#dMain").disabled=true;dLabels(dndMode);
   const pick=x=>x[Math.floor(Math.random()*x.length)];
   if(dndMode){const res=DND.m.map(pick);$("#dTurn").textContent=`Main event. ${pname(dndTurn||CLOUD.me)} rolled it.`;
-    ["A","B","C"].forEach((k,i)=>{const el=$("#die"+k),b=el.querySelector("b");el.classList.remove("land","wild");el.classList.add("roll");const iv=setInterval(()=>{b.textContent=pick(DND.m[i]);},70);
+    ["A","B","C"].forEach((k,i)=>{const el=$("#die"+k),b=el.querySelector("b");el.classList.remove("land","wild");el.classList.add("roll");b.classList.remove("emo");const iv=setInterval(()=>{b.textContent=pick(DND.m[i]);},70);
       setTimeout(()=>{clearInterval(iv);b.textContent=res[i];el.classList.remove("roll");el.classList.add("land");try{navigator.vibrate&&navigator.vibrate(18);}catch(e){}
         if(i===2){dndBusy=false;dndRe=false;$("#dRoll").disabled=false;$("#dRoll").textContent="Back to the dice";$("#dStop").hidden=false;dMainBtn();
           const have=bank(CLOUD.me);$("#dAgain").hidden=false;$("#dAgain").disabled=have<1;$("#dAgain").textContent=have<1?"Re-roll needs a token":"Re-roll · 1 token";}},900+i*450);});return;}
   const res=[pick(DND.a),pick(DND.b),pick(DND.c)],wild=Math.random()<.12?pick(DND.wild):null;
   ["A","B","C"].forEach((k,i)=>{const el=$("#die"+k),b=el.querySelector("b");el.classList.remove("land","wild");el.classList.add("roll");
-    const src=[DND.a,DND.b,DND.c.map(x=>x[0])][i];const iv=setInterval(()=>{b.textContent=pick(src);},70);
-    setTimeout(()=>{clearInterval(iv);b.textContent=i===2?res[2][0]:res[i];el.classList.remove("roll");el.classList.add("land");try{navigator.vibrate&&navigator.vibrate(18);}catch(e){}
+    const src=[DND.a,DND.b,DND.c.map(x=>x[0])][i];b.classList.remove("emo");const iv=setInterval(()=>{b.textContent=pick(src);},70);
+    setTimeout(()=>{clearInterval(iv);b.textContent=i===2?res[2][0]:res[i];b.classList.toggle("emo",b.textContent==="🍑");el.classList.remove("roll");el.classList.add("land");try{navigator.vibrate&&navigator.vibrate(18);}catch(e){}
       if(i===2){dndBusy=false;if(!dndRe)dBump();dndRe=false;dMainBtn();$("#dRoll").disabled=false;$("#dRoll").textContent="Next turn";$("#dStop").hidden=false;
         const have=bank(CLOUD.me);$("#dAgain").hidden=false;$("#dAgain").disabled=have<1;$("#dAgain").textContent=have<1?"Re-roll needs a token":"Re-roll · 1 token";
         if(wild){$("#dieA").classList.add("wild");$("#dTurn").textContent=`Wild card. ${wild}`;}
@@ -1240,7 +1242,7 @@ $("#dRoll").onclick=()=>{if($("#dRoll").textContent!=="Roll"){dndTurn=dOther(dnd
 $("#dMain").onclick=()=>{if(dRounds()<DND.need)return;dndRoll(true);};
 $("#dAgain").onclick=()=>{const me=CLOUD.me;if(bank(me)<1)return;VAULT.spent[me]++;store.set("vault",VAULT);vault();toast(`${pname(me)} spent a token.`);dndRe=true;if(!dndMode)dndRender();dndRoll(dndMode);};
 $("#dGo").onclick=()=>{if(dndIv||!dndSecs)return;$("#dGo").hidden=true;let n=dndSecs;dndIv=setInterval(()=>{n--;$("#dNum").textContent=fmt(Math.max(n,0));if(n<=0){clearInterval(dndIv);dndIv=null;$("#dNum").textContent="Time.";$("#dNum").classList.add("done");try{navigator.vibrate&&navigator.vibrate([120,80,120]);}catch(e){}}},1000);};
-$("#dStop").onclick=()=>{dndStop();dndMode=false;dLabels(false);dMainBtn();$("#dAgain").hidden=true;$("#dRoll").textContent="Roll";["A","B","C"].forEach(k=>{const el=$("#die"+k);el.classList.remove("land","wild");el.querySelector("b").textContent="?";});$("#dTurn").textContent="Red light. Stopped. Roll again when you both want to.";};
+$("#dStop").onclick=()=>{dndStop();dndMode=false;dLabels(false);dMainBtn();$("#dAgain").hidden=true;$("#dRoll").textContent="Roll";["A","B","C"].forEach(k=>{const el=$("#die"+k);el.classList.remove("land","wild");el.querySelector("b").classList.remove("emo");el.querySelector("b").textContent="?";});$("#dTurn").textContent="Red light. Stopped. Roll again when you both want to.";};
 
 /* places to try */
 let PLACES=store.get("places",[
