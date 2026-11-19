@@ -539,6 +539,13 @@ body.night .die3.land{box-shadow:0 0 0 1px rgba(255,63,180,.5),0 0 18px rgba(255
 .btn.main:disabled{background:var(--soft);color:var(--muted);opacity:1}
 
 .die3 b.emo{font-size:2.6rem;line-height:1}
+
+.buzz{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:10px}
+.bz{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.bz button{border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:14px;padding:12px 4px;font:inherit;font-weight:600;font-size:.78rem;cursor:pointer}
+.bz button.on{background:linear-gradient(135deg,#b3123a,#5a0c22);color:#fff;border-color:transparent;animation:bzz .12s linear infinite alternate}
+@keyframes bzz{from{transform:translateX(-1px)}to{transform:translateX(1px)}}
+@media (prefers-reduced-motion:reduce){.bz button.on{animation:none}}
 </style>
 
 <canvas id="sky" aria-hidden="true"></canvas>
@@ -874,6 +881,9 @@ body.night .die3.land{box-shadow:0 0 0 1px rgba(255,63,180,.5),0 0 18px rgba(255
   <button class="btn" type="button" id="dRoll">Roll</button>
   <button class="btn main" type="button" id="dMain" disabled>Main event · 3 more rounds to unlock</button>
   <div class="two" style="margin-top:10px"><button class="btn ghost" type="button" id="dAgain" hidden>Re-roll · 1 token</button><button class="btn ghost" type="button" id="dStop" hidden>Red light</button></div>
+  <div class="buzz" id="buzz" hidden><p class="eyebrow">Buzz · this phone only</p>
+    <div class="bz"><button type="button" data-b="steady">Steady</button><button type="button" data-b="pulse">Pulse</button><button type="button" data-b="wave">Wave</button><button type="button" data-b="build">Slow build</button></div>
+    <button class="btn ghost" type="button" id="bzStop" hidden>Stop the buzz</button></div>
 </div></div>
 
 <div class="veil" id="p-did" hidden><div class="sheet datecard" role="dialog" aria-label="Date done">
@@ -1243,6 +1253,17 @@ $("#dMain").onclick=()=>{if(dRounds()<DND.need)return;dndRoll(true);};
 $("#dAgain").onclick=()=>{const me=CLOUD.me;if(bank(me)<1)return;VAULT.spent[me]++;store.set("vault",VAULT);vault();toast(`${pname(me)} spent a token.`);dndRe=true;if(!dndMode)dndRender();dndRoll(dndMode);};
 $("#dGo").onclick=()=>{if(dndIv||!dndSecs)return;$("#dGo").hidden=true;let n=dndSecs;dndIv=setInterval(()=>{n--;$("#dNum").textContent=fmt(Math.max(n,0));if(n<=0){clearInterval(dndIv);dndIv=null;$("#dNum").textContent="Time.";$("#dNum").classList.add("done");try{navigator.vibrate&&navigator.vibrate([120,80,120]);}catch(e){}}},1000);};
 $("#dStop").onclick=()=>{dndStop();dndMode=false;dLabels(false);dMainBtn();$("#dAgain").hidden=true;$("#dRoll").textContent="Roll";["A","B","C"].forEach(k=>{const el=$("#die"+k);el.classList.remove("land","wild");el.querySelector("b").classList.remove("emo");el.querySelector("b").textContent="?";});$("#dTurn").textContent="Red light. Stopped. Roll again when you both want to.";};
+
+/* buzz: only on phones that can vibrate from a web page (Android, not iPhone) */
+const BUZZ={steady:[10000],pulse:[350,180],wave:[150,90,150,90,600,280],build:[100,450,200,400,350,320,550,260,800,200,1200,150,1800,100,2600,120]};
+let bzIv=null;const canBuzz="vibrate" in navigator&&!/iPhone|iPad|iPod/.test(navigator.userAgent);
+function buzzStop(){clearInterval(bzIv);bzIv=null;try{navigator.vibrate(0);}catch(e){}document.querySelectorAll(".bz button").forEach(x=>x.classList.remove("on"));$("#bzStop").hidden=true;}
+if(canBuzz){$("#buzz").hidden=false;
+  document.querySelectorAll(".bz button").forEach(b=>b.onclick=()=>{const was=b.classList.contains("on");buzzStop();if(was)return;
+    let pat=BUZZ[b.dataset.b];if(pat.length===2){const one=pat;pat=[];for(let i=0;i<12;i++)pat.push(one[0],one[1]);}
+    const total=pat.reduce((a,c)=>a+c,0);const go=()=>{try{navigator.vibrate(pat);}catch(e){}};go();bzIv=setInterval(go,total);b.classList.add("on");$("#bzStop").hidden=false;});
+  $("#bzStop").onclick=buzzStop;document.addEventListener("visibilitychange",()=>{if(document.hidden)buzzStop();});
+  document.querySelectorAll("#p-dnd [data-close]").forEach(x=>x.addEventListener("click",buzzStop));$("#dStop").addEventListener("click",buzzStop);}
 
 /* places to try */
 let PLACES=store.get("places",[
