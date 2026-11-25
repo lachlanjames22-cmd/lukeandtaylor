@@ -37,7 +37,7 @@ const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=nu
 function locked(unlock){
   clearInterval(timer);
   app.innerHTML=`<div class="screen night"><div class="box"><div class="neon">Not yet</div>
-  <p>Unlocks after your night out.<br>Go have fun. I'll be here when the sun's up.</p>
+  <p>Unlocks after your night out.<br>Go have fun. Come back in the morning.</p>
   <div class="foot">L x</div></div></div>`;
   const tick=()=>{if(unlock-Date.now()<=0){clearInterval(timer);setTimeout(load,1500);}};
   tick();timer=setInterval(tick,1000);
