@@ -36,14 +36,10 @@ const app=document.getElementById('app');let timer;
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 function locked(unlock){
   clearInterval(timer);
-  app.innerHTML=`<div class="screen night"><div class="box"><div class="neon">Not yet,<br>Taylor</div>
-  <p>This one opens ${LABEL}.<br>Go have fun. I'll be here when the sun's up.</p>
-  <div class="count"><div><b id="d">0</b><small>days</small></div><div><b id="h">00</b><small>hrs</small></div><div><b id="m">00</b><small>min</small></div><div><b id="s">00</b><small>sec</small></div></div>
+  app.innerHTML=`<div class="screen night"><div class="box"><div class="neon">Not yet</div>
+  <p>Unlocks after your night out.<br>Go have fun. I'll be here when the sun's up.</p>
   <div class="foot">L x</div></div></div>`;
-  const f=x=>String(x).padStart(2,'0');
-  const tick=()=>{const ms=unlock-Date.now();
-    if(ms<=0){clearInterval(timer);setTimeout(load,1500);return}
-    d.textContent=Math.floor(ms/864e5);h.textContent=f(Math.floor(ms/36e5)%24);m.textContent=f(Math.floor(ms/6e4)%60);s.textContent=f(Math.floor(ms/1e3)%60)};
+  const tick=()=>{if(unlock-Date.now()<=0){clearInterval(timer);setTimeout(load,1500);}};
   tick();timer=setInterval(tick,1000);
 }
 function open(n){
