@@ -58,7 +58,7 @@ function open(n){
   (n.items||[]).forEach(it=>{
     if(it.t==='p')note.appendChild(el('p',null,it.x));
     else if(it.t==='img')note.appendChild(snap(it.src,it.c));
-    else if(it.t==='sig')note.appendChild(el('div','sig','L x'));
+    else if(it.t==='sig')note.appendChild(el('div','sig',it.x||'L x'));
     else if(it.t==='ps')note.appendChild(el('p','ps',it.x));
     else if(it.t==='pair'){const d=el('div','pair');it.srcs.forEach((s,i)=>d.appendChild(snap(s,i?'tilt':'')));note.appendChild(d)}
   });
